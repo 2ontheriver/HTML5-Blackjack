@@ -1,0 +1,44 @@
+
+body{
+	padding: 0;
+	margin: 0;
+}
+
+canvas, #no_canvas_container, #blackjack{
+	position: absolute; 
+	width: 920px;
+	height: 580px;
+	display: block;
+	left: 0;
+	right: 0;
+}
+
+#no_canvas_container{
+	border: 1px solid #000;
+	padding: 12px;
+	box-sizing: border-box;
+}
+
+input#name_input{
+	position: absolute; 
+	text-align: center;
+	z-index: 2100;
+	margin: 0 auto;
+	color = '#000'
+}
+
+#blackjack ::-webkit-input-placeholder {
+   text-align: center;
+}
+
+#blackjack :-moz-placeholder { /* Firefox 18- */
+   text-align: center;  
+}
+
+#blackjack ::-moz-placeholder {  /* Firefox 19+ */
+   text-align: center;  
+}
+
+#blackjack :-ms-input-placeholder {  
+   text-align: center; 
+}

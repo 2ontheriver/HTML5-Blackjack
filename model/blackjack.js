@@ -1,219 +1,8 @@
-Number.isInteger = Number.isInteger || function(value) {
-    return typeof value === "number" && 
-           isFinite(value) && 
-           Math.floor(value) === value;
-};
 
-function Card(suitIn, valueIn, faceUpIn) { //card constructor function, note for valueIn Ace = 1, 2 = 2 ... K = 13
-    if(valueIn < 1 || valueIn > 13 || !Number.isInteger(valueIn)) throw new Error("You have tried to create a card with an incorrect value");
-	this.suit = suitIn;
-    this.value = valueIn;
-    this.faceUp = faceUpIn;
-	this.getName = function(){
-		return this.suit + "_" + this.value;
-	}
-	this.getBJValue = function(){
-	    if(this.value >= 1 && this.value <= 9) return this.value;
-		else if(this.value >= 10 && this.value <= 13) return 10;
-	}
-	this.getValueString = function(){
-	    var cardNames = ["Ace", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Jack", "Queen", "King"];
-		return cardNames[(this.value-1)]
-	}
-	this.getSuitString = function(){
-        switch (this.suit) {
-            case "c" : return "Clubs"; case "d" : return "Diamonds"; case "h" : return "Hearts"; case "s" : return "Spades"; 
-			default : return null; //should this throw an error? or should the 
-        }
-	}
-    this.toString = function(){ return this.getValueString() + " of " + this.getSuitString() };
-}
 
-function Deck(){
-    this.cards = [];
-	var suits = ['s', 'd', 'c', 'h'];
-	for(var suitIndex = 0; suitIndex < suits.length; suitIndex++) {
-	    for	(cardValue = 1; cardValue <= 13; cardValue++) {
-            this.cards.push(new Card(suits[suitIndex], cardValue));
-        } 
-    }
-	this.shuffle = function(){
-        var m = this.cards.length, t, i;
-        while (m) { // While there remain elements to shuffle…
-            i = Math.floor(Math.random() * m--); // Pick a remaining element…
-            // And swap it with the current element.
-            t = this.cards[m];
-            this.cards[m] = this.cards[i];
-            this.cards[i] = t;
-        }
-        return this.cards;
-    }
-	this.dealTopCard = function(){
-	    return this.cards.shift();
-	}
-	this.toString = function(){ 
-	    var returnText = "";
-		for	(var cardIndex = 0; cardIndex < this.cards.length; cardIndex++) {
-		    returnText += "\n" + this.cards[cardIndex];
-		}
-		return returnText;
-	};
-}
-
-function Hand(){
-    this.playedHand = false;
-    this.doubled = false;
-	this.cards = [];
-	this.hasAce = function(){
-	    for(var cardIndex = 0; cardIndex < this.cards.length; cardIndex++) { if(this.cards[cardIndex].getBJValue() == 1) return true; }
-		return false;
-	}
-	this.getHandValue = function(){ //returns the (int)value of the hand, with ace as 1 unless they have made 21 which is returned instead
-        var returnValue = 0;
-        for	(var cardIndex = 0; cardIndex < this.cards.length; cardIndex++) {
-            returnValue += this.cards[cardIndex].getBJValue();
-        }
-	    if(returnValue == 11 && this.hasAce()) return 21;
-        return returnValue;
-	}
-	this.getHandValueTxt = function(){
-	    if(this.has21()) return 21;
-		else if(this.isBust()) return 'Bust';
-		else if(this.playedHand) return (this.hasAce() && (this.getHandValue() < 11) ? this.getHandValue() + 10 : this.getHandValue());
-	    else return this.getHandValue() + (this.hasAce() && (this.getHandValue() < 11) ? " or " + (this.getHandValue() + 10) : "");
-	}
-	this.hasPair = function(){
-	    if(this.cards.length == 2 && this.cards[0].getBJValue() == this.cards[1].getBJValue()) return true;
-		return false;
-	}
-	this.canBeDoubled = function(){
-	    if(this.cards.length == 2 && !this.has21())return true;
-		return false;
-	}
-	this.isBust = function(){
-	    if (this.getHandValue() > 21) return true; else return false;
-	}
-	this.has21 = function(){
-	    if(this.getHandValue() == 21) return true; else return false;
-	}
-	this.getFinsihedBestHandValue = function(){
-	    var handValue = this.getHandValue();
-	    if(handValue > 21) return 0;
-		if(handValue <= 11 && this.hasAce()) handValue += 10;
-		return handValue;
-	}
-	this.toString = function(){
-	    var returnText = "";
-		for	(var cardIndex = 0; cardIndex < this.cards.length; cardIndex++) {
-		    returnText += this.cards[cardIndex] + (cardIndex !== (this.cards.length-1) ? ", " : "");
-		}
-		return returnText += " (" + this.getHandValueTxt() + ")" + (!this.playedHand && this.cards.length > 1 ? ' <' : '') + (this.doubled ? ' (Doubled)' : '');
-	};
-}
-
-function User(nameIn, balanceIn){
-    this.name = nameIn;
-	this.balance = balanceIn;
-	this.hands = [];
-	this.hands[0] = new Hand();
-	this.selectHand = function(){ //returns the Hand that is currently being played or false if all hands have been played
-		for	(var handIndex = 0; handIndex < this.hands.length; handIndex++) {
-			if(!this.hands[handIndex].playedHand) return this.hands[handIndex];
-		}
-		return false;
-	}
-	this.getCurrentHandNo = function(){ //returns the Hand index in the array, 1st hand = 0, 2nd hand = 1
-		for	(var handIndex = 0; handIndex < this.hands.length; handIndex++) {
-			if(!this.hands[handIndex].playedHand) return handIndex;
-		}
-		return false;
-	}
-	this.finishCurrentHand = function(){
-		this.selectHand().playedHand = true;
-	}
-	this.addCard = function(cardIn){
-	    var currentHand = this.selectHand();
-	    currentHand.cards.push(cardIn);
-	}
-	this.splits = function(){
-	    var currentHand = this.selectHand();
-	    this.hands[1] = new Hand();
-	    this.hands[1].cards.push(currentHand.cards.pop()); //take a card from the current hand, and put in in the next hand
-	}
-	this.hasSplit = function(){ //function not used much!
-	    if(this.hands.length > 1) return true; 
-		return false;
-	}
-	this.hasBJ = function(){ 
-	    if(this.hands.length != 1) return false; //if the user has split.
-	    if(this.hands[0].cards.length == 2 && this.hands[0].has21()) return true; 
-		else return false;
-	}
-	this.allHandsBust = function(){
-	    for	(var handIndex = 0; handIndex < this.hands.length; handIndex++) {
-			if(!this.hands[handIndex].isBust()) return false;
-		}
-		return true;
-	}
-	this.handReset = function(){ 
-		this.hands = [];
-		this.hands[0] = new Hand();
-	}
-	this.toString = function(){
-	    var returnText = this.name + ".";
-		for	(var handIndex = 0; handIndex < this.hands.length; handIndex++) {
-		    returnText += " Hand " + (handIndex+1) + ": ";
-		    returnText += this.hands[handIndex].toString();
-		}
-		return returnText;
-	}
-}
-
-function Dealer(){
-    this.name = 'Dealer';
-	this.cards = [];
-	this.addCard = function(card){
-	    this.cards.push(card);
-	}
-	this.hasAce = function(){
-	    for(var cardIndex = 0; cardIndex < this.cards.length; cardIndex++) { if(this.cards[cardIndex].getBJValue() == 1) return true; }
-		return false;
-	}
-    this.getHandValue = function(){ //returns the (int)value of the hand, with ace as 1 unless the dealer has made 17+ which is returned instead
-        var returnValue = 0;
-        for	(var cardIndex = 0; cardIndex < this.cards.length; cardIndex++) {
-            returnValue += this.cards[cardIndex].getBJValue();
-        }
-	    if((returnValue >=7 && returnValue <= 11) && this.hasAce()) returnValue += 10;
-        return returnValue;
-	}
-	this.getHandValueTxt = function(){
-	    var handV = this.getHandValue();
-	    if(handV >= 17  && handV <= 21) return handV;
-		else if(handV > 21) return 'Bust';
-	    else return handV + (this.hasAce() && (handV < 11) ? " or " + (handV + 10) : "");
-	}
-	this.hasBJ = function(){ //check to see if the dealer has Blackjack, dealt 21 in their first 2 cards
-	    if(this.cards.length == 2 && this.getHandValue() == 21) return true; else return false;
-	}
-	this.getFinsihedBestHandValue = function(){
-	    if(this.getHandValue() > 21) return 0;
-	    return this.getHandValue();
-	}
-	this.handReset = function(){ 
-	    this.cards = [];
-	}
-	this.toString = function(){ 
-	    var returnText = "";
-		for	(var cardIndex = 0; cardIndex < this.cards.length; cardIndex++) {
-		    returnText += this.cards[cardIndex] + (cardIndex !== (this.cards.length-1) ? ", " : "");
-		}
-		return returnText += " (" + this.getHandValueTxt() + ")";
-	};
-}
-
-function Table(){ //Model
-    this.user;
+game.blackjack = function(){ //Model
+    
+	this.user;
     this.dealer;
 	this.deck = new Deck();
 	this.previousBet = 0;
@@ -245,7 +34,7 @@ function Table(){ //Model
 		this.userBalanceChange.notify();
 	}
 	this.startGame = function(nameIn, balanceIn){
-		if(balanceIn === undefined) balanceIn = 10000;
+		if(typeof balanceIn === 'undefined') balanceIn = game.startingChips;
 	    if(nameIn.length > 2 && nameIn.length < 11){
 		    this.user = new User(nameIn, balanceIn);
 		    this.dealer = new Dealer();
@@ -269,7 +58,7 @@ function Table(){ //Model
 		var failMessage = '';
 	    if((!Number.isInteger(betIn)) || betIn <= 0) failMessage = 'Enter a number greater than 0.';
 	    else if(this.maxBet < (betIn+this.startingBet)) failMessage = 'The table limit is ' + this.maxBet + '.';
-	    else if(this.user.balance < betIn) failMessage = 'You do have enough in your cashier to place this bet.';
+	    else if(this.user.balance < betIn) failMessage = 'You do not have enough in your cashier to place this bet.';
 		if(failMessage != ''){
 		    this.userMessage.notify(failMessage);
 		    return false; 
@@ -471,7 +260,7 @@ function Table(){ //Model
 		this.previousBet = this.startingBet;
 		this.startingBet = 0;
 		this.insuranceBet = 0;
-		if(this.user.balance < this.minBet) this.gameEnding.notify(this.user.name + ' you do not have enough in your cashier to place a bet!');
+		if(this.user.balance < this.minBet) this.gameEnding.notify('Game Over. You have less than the minimum bet. Click \'Leave\'');
 		else if(reBet && this.placeBet(this.previousBet)) this.deal();
 		else this.gameStarting.notify();
 	}
