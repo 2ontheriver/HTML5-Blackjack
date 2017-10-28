@@ -2,33 +2,30 @@
 <html>
 <head>
 
-<link rel="stylesheet" type="text/css" href="http://devserver/html5/my_blackjack/style.css">
+<link rel="stylesheet" type="text/css" href="style.css">
 
-<script src="http://devserver/html5/my_blackjack/main.js"></script>
+<script src="main.js"></script>
 
-<script src="http://devserver/html5/my_blackjack/functions/general.js"></script> 
+<script src="functions/general.js"></script> 
 
-<script src="http://devserver/html5/my_blackjack/model/event.js"></script> 
-<script src="http://devserver/html5/my_blackjack/model/card.js"></script> 
-<script src="http://devserver/html5/my_blackjack/model/dealer.js"></script> 
-<script src="http://devserver/html5/my_blackjack/model/deck.js"></script> 
-<script src="http://devserver/html5/my_blackjack/model/hand.js"></script> 
-<script src="http://devserver/html5/my_blackjack/model/user.js"></script> 
-<script src="http://devserver/html5/my_blackjack/model/blackjack.js"></script> 
+<script src="model/event.js"></script> 
+<script src="model/card.js"></script> 
+<script src="model/dealer.js"></script> 
+<script src="model/deck.js"></script> 
+<script src="model/hand.js"></script> 
+<script src="model/user.js"></script> 
+<script src="model/blackjack.js"></script> 
 
-<script src="http://devserver/html5/my_blackjack/canvas/background.js"></script> 
-<script src="http://devserver/html5/my_blackjack/canvas/view.js"></script>
-<script src="http://devserver/html5/my_blackjack/canvas/controller.js"></script>
+<script src="canvas/background.js"></script> 
+<script src="canvas/view.js"></script>
+<script src="canvas/controller.js"></script>
 
-<script src="http://devserver/html5/my_blackjack/no_canvas/background.js"></script> 
-<script src="http://devserver/html5/my_blackjack/no_canvas/view.js"></script>
-<script src="http://devserver/html5/my_blackjack/no_canvas/controller.js"></script>
+<script src="no_canvas/background.js"></script> 
+<script src="no_canvas/view.js"></script>
+<script src="no_canvas/controller.js"></script>
 <script>
 window.onload = function() {
-	//new blackjackGame('blackjack', '/html5/my_blackjack/', 920, 10000);
 	new blackjackGame('blackjack', '', 600, 2000, false);
-	//new blackjackGame('blackjack', '/html5/my_blackjack/', 550, 10000, true);
-	//new blackjackGame('blackjack', '/html5/my_blackjack/', 460, 10000);
 }
 </script>
 
