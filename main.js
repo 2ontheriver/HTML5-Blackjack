@@ -29,7 +29,7 @@ function blackjackGame(elementId, appLocation, width, chips, forceNoCanvas) {
 		game.scaleRatio = game.width / game.standardWidth; 
 	}
 	
-	if(typeof appLocation !== 'undefined') game.imageLocation = appLocation + 'images/';
+	if(typeof appLocation !== 'undefined') game.imageLocation = appLocation + game.imageLocation;
 	
 	if(typeof chips !== 'undefined') game.startingChips = chips;
 	

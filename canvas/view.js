@@ -65,18 +65,7 @@ game.canvas.view = function(blackjackIn){ //View
 	this.nameInput.id = "name_input";
 	this.nameInput.maxLength  = 10;
 	this.nameInput.startValue = "enter name";
-	//this.rect.left;
-	//this.rect.top;
 
-	/*
-	var viewportOffset = this.hitCanvas.getBoundingClientRect();
-// these are relative to the viewport, i.e. the window
-var top = viewportOffset.top;
-var left = viewportOffset.left;
-	
-	alert('left : ' + this.rect.left + ' top: ' + this.rect.top + 
-	'\n left : ' + left + ' top: ' + top);
-*/
 	var btnHeigth = 50;
 	var btnTop = 520;
     this.buttons = {
@@ -126,12 +115,6 @@ var left = viewportOffset.left;
 		//use the game.scaleRatio variable to scale the click onto the default hitmap
 		x /= game.scaleRatio; 
 		y /= game.scaleRatio;
-		/*
-		alert('bounding rectangle left = ' + rect.left + ' top = ' + rect.top + 
-		'\n x = ' + x + ' y = ' + y + 
-		'\n rect.left = ' + rect.left + ' rect.top = ' + rect.top + '\n' + 
-		' x = ' +  buttonIn.left + '+' + buttonIn.width + 'y = ' + buttonIn.top + '+' + buttonIn.height);
-		*/
 		if(y > buttonIn.top && y < buttonIn.top + buttonIn.height && x > buttonIn.left && x < buttonIn.left + buttonIn.width) return true;
 		return false;
 	}
@@ -207,12 +190,31 @@ var left = viewportOffset.left;
 		this.hitCanvas.removeEventListener("click", this.newHandOptionClicked);
 		this.playerCardsLayer.clearRect(0, 0, this.playerCardsCanvas.width, this.playerCardsCanvas.height);
 		this.dealerCardsLayer.clearRect(0, 0, this.dealerCardsCanvas.width, this.dealerCardsCanvas.height);
-		this.playerCardsLayer.drawImage(this.lookup[this.blackjack.user.hands[0].cards[0].getName()],this.plyrDealCrdPos[0].x,this.plyrDealCrdPos[0].y);
-		this.dealerCardsLayer.drawImage(this.lookup[this.blackjack.dealer.cards[0].getName()],this.dlrStrtCrdPos.x,this.dlrStrtCrdPos.y);
-		this.plyrDealCrdPos[0].x += this.plyrMveCrd.x;
-		this.plyrDealCrdPos[0].y += this.plyrMveCrd.y;
-		this.playerCardsLayer.drawImage(this.lookup[this.blackjack.user.hands[0].cards[1].getName()],this.plyrDealCrdPos[0].x,this.plyrDealCrdPos[0].y); 
+		this.animatePlayerCard(0,0);
+		this.animateDealerCard(0);
+		//this.plyrDealCrdPos[0].x += this.plyrMveCrd.x;
+		//this.plyrDealCrdPos[0].y += this.plyrMveCrd.y;
 	}
+
+	this.animateDealerCard = function(cardNo){
+		var _this = this
+		setTimeout(function(){
+			_this.dealerCardsLayer.drawImage(_this.lookup[_this.blackjack.dealer.cards[cardNo].getName()],_this.dlrStrtCrdPos.x,_this.dlrStrtCrdPos.y);
+		}, 1200)
+	}
+
+	this.animatePlayerCard = function(handNo, cardNo){
+		var _this = this
+		setTimeout(function(){
+			_this.playerCardsLayer.drawImage(_this.lookup[_this.blackjack.user.hands[handNo].cards[cardNo].getName()],_this.plyrDealCrdPos[cardNo].x,_this.plyrDealCrdPos[cardNo].y);
+			_this.plyrDealCrdPos[cardNo].x += _this.plyrMveCrd.x;
+			_this.plyrDealCrdPos[cardNo].y += _this.plyrMveCrd.y;
+			setTimeout(function(){
+				_this.playerCardsLayer.drawImage(_this.lookup[_this.blackjack.user.hands[0].cards[1].getName()],_this.plyrDealCrdPos[0].x,_this.plyrDealCrdPos[0].y); 
+			}, 1200)
+		}, 600);
+	}
+	
 }
 game.canvas.view.prototype.startGame = function() {
 	this.updateBettingBox();
